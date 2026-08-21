@@ -1,0 +1,111 @@
+---
+title: "Getting started with SubtypeR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with SubtypeR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
+```
+
+## Overview
+
+`SubtypeR` assigns a molecular subtype to every cell in a single-cell RNA-seq
+dataset using UCell gene-signature scoring — the same way `cytotrace2()`
+assigns a stemness score to every cell. Starting from a **raw count matrix**,
+the pipeline:
+
+1. Builds/uses a Seurat object and runs `SCTransform` normalization, keeping
+   **all genes** (`return.only.var.genes = FALSE`) so signature genes are
+   never dropped for not being highly variable.
+2. Scores a panel of gene signatures per cell with `UCell`.
+3. Assigns each cell a single subtype label using a per-signature quantile
+   threshold (default: 75th percentile / Q3):
+   - passes exactly one signature -> that signature's name
+   - passes more than one -> `"Mixed"`
+   - passes none -> `"Unknown"`
+
+Two modes are available.
+
+## Mode 1: Automatic (built-in HGSOC panel)
+
+Use this when you're working with high-grade serous ovarian cancer (HGSOC)
+and want to use the package's built-in, curated signature panel
+(Differentiated / Immunoreactive / Mesenchymal / Proliferative).
+
+```{r}
+library(SubtypeR)
+
+# raw_counts: genes x cells raw count matrix (dgCMatrix or matrix)
+res <- RunSubtypeR(
+  input       = raw_counts,
+  mode        = "auto",
+  cancer_type = "HGSOC"
+)
+
+table(res$results$Subtype)
+head(res$results)
+
+# QC plots
+plot_subtype_scores(res$results)
+plot_subtype_composition(res$results)
+
+# Subtype is also written into the Seurat object's metadata
+res$seurat_object$Subtype[1:5]
+```
+
+## Mode 2: Manual (any cancer type via your own .gmt file)
+
+Use this for any other cancer type, or any custom set of gene signatures.
+Supply a standard `.gmt` file: one signature per line, tab-separated, as
+`name<TAB>description<TAB>gene1<TAB>gene2...`.
+
+```{r}
+res <- RunSubtypeR(
+  input    = raw_counts,
+  mode     = "manual",
+  gmt_file = "my_signatures.gmt"
+)
+
+table(res$results$Subtype)
+```
+
+You can also parse a `.gmt` file yourself and inspect it before running:
+
+```{r}
+sigs <- read_gmt("my_signatures.gmt")
+names(sigs)
+sigs[["MySignature1"]]
+```
+
+## Starting from an existing Seurat object
+
+If you already have a Seurat object with raw counts in its default assay,
+pass it directly as `input` — `SubtypeR` will skip `CreateSeuratObject()` and
+run `SCTransform` on it directly:
+
+```{r}
+res <- RunSubtypeR(seurat_obj, mode = "auto", cancer_type = "HGSOC")
+```
+
+## Tuning the subtype call
+
+The Q3 (75th percentile) threshold can be changed via `assign_quantile`. A
+higher value is more stringent (fewer cells called into a defined subtype,
+more `"Unknown"`); a lower value is more permissive:
+
+```{r}
+res_strict <- RunSubtypeR(raw_counts, mode = "auto", assign_quantile = 0.9)
+res_loose  <- RunSubtypeR(raw_counts, mode = "auto", assign_quantile = 0.5)
+```
+
+You can also re-run just the assignment step on existing scores without
+re-scoring:
+
+```{r}
+new_calls <- assign_subtypes(res$results[, grep("_UCell$", colnames(res$results))],
+                              quantile_prob = 0.9)
+```
