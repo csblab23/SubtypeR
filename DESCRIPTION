@@ -2,24 +2,30 @@ Package: SubtypeR
 Type: Package
 Title: UCell-Based Single-Cell Molecular Subtype Assignment
 Version: 0.1.0
-Authors@R: person("Deepika", "Yadav", email = "you@example.com", role = c("aut", "cre"))
-Description: SubtypeR assigns a molecular subtype to every cell in a single-cell
-    RNA-seq dataset using UCell gene-signature scoring, in the spirit of how
-    CytoTRACE2 assigns a stemness score to every cell. Starting from a raw
-    count matrix (or an existing Seurat object), SubtypeR runs SCTransform
-    normalization (retaining all genes, not just variable features), scores
-    a set of gene signatures per cell with UCell, and calls a single-cell
-    subtype label using a per-signature quantile threshold. Two modes are
-    supported: an "auto" mode with a built-in gene-signature panel for
-    high-grade serous ovarian cancer (HGSOC), and a "manual" mode that
-    accepts any user-supplied .gmt file, making the package applicable to
-    any cancer type or any custom set of gene signatures.
+Authors@R:
+    person(
+        "csblab23",
+        email = "csblab23@gmail.com",
+        role = c("aut", "cre")
+    )
+Description:
+    SubtypeR assigns a molecular subtype to every cell in a single-cell
+    RNA-seq dataset using UCell gene-signature scoring, in the spirit of
+    how CytoTRACE2 assigns a stemness score to every cell. Starting from a
+    raw count matrix or an existing Seurat object, SubtypeR runs SCTransform
+    normalization, retaining all genes rather than only variable features,
+    scores a set of gene signatures per cell with UCell, and calls a
+    single-cell subtype label using a per-signature quantile threshold.
+    Two modes are supported: an "auto" mode with a built-in gene-signature
+    panel for high-grade serous ovarian cancer (HGSOC), and a "manual" mode
+    that accepts any user-supplied .gmt file, making the package applicable
+    to any cancer type or custom set of gene signatures.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
-Depends: R (>= 4.1.0)
+Depends:
+    R (>= 4.1.0)
 Imports:
     Seurat (>= 5.0.0),
     UCell (>= 2.4.0),
@@ -40,5 +46,6 @@ Suggests:
     SingleCellExperiment
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-URL: https://github.com/yourusername/SubtypeR
-BugReports: https://github.com/yourusername/SubtypeR/issues
+URL: https://github.com/csblab23/SubtypeR
+BugReports: https://github.com/csblab23/SubtypeR/issues
+Config/roxygen2/version: 8.1.0
