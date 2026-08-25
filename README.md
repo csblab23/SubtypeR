@@ -2,9 +2,7 @@
 
 `SubtypeR` assigns a molecular subtype to every cell in a single-cell RNA-seq
 dataset using [UCell](https://github.com/carmonalab/UCell) gene-signature
-scoring — in the same spirit as
-[`CytoTRACE2`](https://github.com/digitalcytometry/cytotrace2) assigning a
-stemness score to every cell.
+scoring — per cell.
 
 Given a **raw count matrix**, `SubtypeR`:
 
@@ -30,7 +28,7 @@ Given a **raw count matrix**, `SubtypeR`:
 
 ```r
 # install.packages("devtools")
-devtools::install_github("yourusername/SubtypeR")
+devtools::install_github("csblab23/SubtypeR")
 ```
 
 ## Quick start
